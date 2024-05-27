@@ -18,9 +18,9 @@ jobs:
       matrix:
         version: [18, 20]
     steps:     
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Setup Node
-        uses: ./
+        uses: actions/checkout@v3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Verify node and npm
