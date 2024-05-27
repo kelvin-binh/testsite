@@ -14,15 +14,26 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
-      - task: UseNode@1
-          inputs:
-          version: '18.x'
-          displayName: 'Install Node.js'
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run build --if-present
+      - shell: bash
+        # env:
+        #   GDRIVE_FILEFOLDER_ID: ${{ secrets.GDRIVE_FILEFOLDER_ID }}
+        #   GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+        #   GOOGLE_PRIVATE_KEY: '${{ secrets.GOOGLE_PRIVATE_KEY }}'
+        run: npm test      
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
